@@ -12,9 +12,5 @@ Clicking either a link in the list or on a marker brings up information on the p
 * Download all files in the repository.
 * Open index.html in your web browser.
 
-## Run and Connect to Web Server
-* Run project.py by typing "python project.py"
-* Connect to web server at "localhost:8000"
-
 ## Author
 John Austin
