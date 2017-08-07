@@ -43,15 +43,21 @@ var Pin = function (title, location, content) {
     });
     self.isVisible(true);
 
+    function fillInfoWindow() {
+        infoWindow.setContent('<div><strong>' + marker.title + '</strong><br>' + '<span>Nearby Restaurant: </span>' +
+        self.nearestRestaurant.name + '<br>' + self.nearestRestaurant.address + '<br><a href="' +
+        self.nearestRestaurant.url + '">Visit Restaurant Webpage</a></div>');
+    }
+
     // This function will populate the infowindow when clicked.
     function populateInfoWindow(marker, infoWindow) {
         // Check to make sure the infowindow is not already opened on this marker.
-        if (infoWindow.marker != marker) {
+        if (infoWindow.marker !== marker) {
             infoWindow.marker = marker;
             // Fill in infowindow information.
             infoWindow.setContent('<div>' + marker.title + '</div>');
             // Grab nearest restaurant information.  AJAX call only used if first time to request info.
-            if (self.nearestRestaurant.name != '') {
+            if (self.nearestRestaurant.name !== '') {
                 fillInfoWindow();
             } else {
                 var foursquare_url =  "https://api.foursquare.com/v2/venues/explore?" +
@@ -69,11 +75,6 @@ var Pin = function (title, location, content) {
                 }});
             }
 
-            function fillInfoWindow() {
-                infoWindow.setContent('<div><strong>' + marker.title + '</strong><br>' + '<span>Nearby Restaurant: </span>' +
-                    self.nearestRestaurant.name + '<br>' + self.nearestRestaurant.address + '<br><a href="' +
-                    self.nearestRestaurant.url + '">Visit Restaurant Webpage</a></div>');
-            }
             infoWindow.open(map, marker);
             // Make sure the marker property is cleared if the infowindow is closed.
             infoWindow.addListener('closeclick', function () {
