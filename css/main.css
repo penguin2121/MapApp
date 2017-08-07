@@ -1,0 +1,28 @@
+* {
+    box-sizing: border-box;
+    font-family: "Source Sand Pro", sans-serif;
+}
+
+li {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#map {
+    position: absolute;
+    top: 0px;
+    left: 250px;
+    right: 0px;
+    bottom: 0px;
+}
+
+
+@media screen and (max-width: 850px) {
+    #map {
+        position: absolute;
+        top: 220px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+    }
+}
