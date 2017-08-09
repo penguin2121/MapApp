@@ -4,22 +4,22 @@
     <title>John's Map App</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="css/main.css"
+    <link rel="stylesheet" type="text/css" href="css/main.css">
     <script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.2.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 </head>
 <body id="body-id">
     <div id="main-container">
-        <span id="search-container">
+        <div id="search-container">
             <p id="filter-field">Filter: <input data-bind="value: filterText, valueUpdate: 'afterkeydown'" placeholder="Filter Locations"></p>
             <ul id="list-field" data-bind="foreach:filteredLocations" class="location-name">
                 <li><a href="#" data-bind="text: title, click: setLocation"></a></li>
             </ul>
-        </span>
+        </div>
         <div id="map"></div>
-        <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoOVq914dQtpUtuHq016GnDuyy3Wi7r3A&v=3&callback=initMap"></script>
         <script src="script/app.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoOVq914dQtpUtuHq016GnDuyy3Wi7r3A&v=3&callback=initMap" onerror="mapFailure()"></script>
     </div>
 </body>
 </html>

@@ -6,16 +6,17 @@ var bounds;
 // This is a Pin constructor.
 var Pin = function (title, location, content) {
     var self = this;
+    self.failToConnectToFoursquare = false;
 
-    self.title = ko.observable(title);
-    self.lat = ko.observable(location.lat);
-    self.lng = ko.observable(location.lng);
-    self.content = ko.observable(content);
+    self.title = title;
+    self.lat = location.lat;
+    self.lng = location.lng;
+    self.content = content;
     self.nearestRestaurant = {name: '', address: '', url: ''};
 
     self.marker = new google.maps.Marker({
         position: location,
-        title: self.title(),
+        title: self.title,
         map: map,
         animation: google.maps.Animation.DROP
     });
@@ -43,10 +44,21 @@ var Pin = function (title, location, content) {
     });
     self.isVisible(true);
 
-    function fillInfoWindow() {
-        infoWindow.setContent('<div><strong>' + marker.title + '</strong><br>' + '<span>Nearby Restaurant: </span>' +
-        self.nearestRestaurant.name + '<br>' + self.nearestRestaurant.address + '<br><a href="' +
-        self.nearestRestaurant.url + '">Visit Restaurant Webpage</a></div>');
+    function fillInfoWindow(marker) {
+        var url;
+        if (self.failToConnectToFoursquare) {
+            infoWindow.setContent('<div><strong>' + marker.title + '</strong><br><span>Failed to Connect to Foursquare</span>');
+        } else {
+            if (self.nearestRestaurant.url === undefined) {
+                infoWindow.setContent('<div><strong>' + marker.title + '</strong><br>' + '<span>Nearby Restaurant: </span>' +
+                    self.nearestRestaurant.name + '<br>' + self.nearestRestaurant.address + '<br><span>No Website Available</span></div>');
+            } else {
+                infoWindow.setContent('<div><strong>' + marker.title + '</strong><br>' + '<span>Nearby Restaurant: </span>' +
+                    self.nearestRestaurant.name + '<br>' + self.nearestRestaurant.address + '<br><a href="' +
+                    self.nearestRestaurant.url + '">Visit Restaurant Webpage</a></div>');
+            }
+
+        }
     }
 
     // This function will populate the infowindow when clicked.
@@ -58,21 +70,24 @@ var Pin = function (title, location, content) {
             infoWindow.setContent('<div>' + marker.title + '</div>');
             // Grab nearest restaurant information.  AJAX call only used if first time to request info.
             if (self.nearestRestaurant.name !== '') {
-                fillInfoWindow();
+                fillInfoWindow(marker);
             } else {
                 var foursquare_url =  "https://api.foursquare.com/v2/venues/explore?" +
                     "client_id=0WJFTOOAZT02YAGKUXMKK250D5HZZXB4MWP5GW1PECQFUOSY" +
                     "&client_secret=YD4DXJOGYLKRCZSXZE2VYYKMNXCDGFUNYSFKJ4JMEIPYBL1V" +
                     "&v=20170806&ll=" + marker.position.lat().toString() + ',' + marker.position.lng().toString() +
                     "&query=food&limit=1&openNow=0&sortByDistance=1";
-                $.ajax({url: foursquare_url, success: function (result) {
+                $.ajax({url: foursquare_url}).done(function (result) {
                     self.nearestRestaurant.name = result.response.groups[0].items[0].venue.name;
                     self.nearestRestaurant.address = result.response.groups[0].items[0].venue.location.address +
                         ", " +  result.response.groups[0].items[0].venue.location.city + ", " +
                         result.response.groups[0].items[0].venue.location.state;
                     self.nearestRestaurant.url = result.response.groups[0].items[0].venue.url;
-                    fillInfoWindow();
-                }});
+                    fillInfoWindow(marker);
+                    self.failToConnectToFoursquare = false;
+                }).fail(function () {
+                    self.failToConnectToFoursquare = true;
+                });
             }
 
             infoWindow.open(map, marker);
@@ -124,12 +139,18 @@ function MapViewModel() {
             // the map visibility to true for only the filtered elements.
             var filter = self.filterText().toLowerCase();
             return ko.utils.arrayFilter(self.locations(), function (location) {
-                var doesMatch = location.title().toLowerCase().includes(filter);
+                var doesMatch = location.title.toLowerCase().includes(filter);
                 location.isVisible(doesMatch);
                 return doesMatch;
             });
         }
     }, this);
+}
+
+
+function mapFailure() {
+    var mapElement = document.getElementById('map');
+    mapElement.innerHTML = "<span>Failure to Load Map.<br>Please check map URL for Google Maps.</span>";
 }
 
 
