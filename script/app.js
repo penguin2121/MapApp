@@ -83,10 +83,11 @@ var Pin = function (title, location, content) {
                         ", " +  result.response.groups[0].items[0].venue.location.city + ", " +
                         result.response.groups[0].items[0].venue.location.state;
                     self.nearestRestaurant.url = result.response.groups[0].items[0].venue.url;
-                    fillInfoWindow(marker);
                     self.failToConnectToFoursquare = false;
                 }).fail(function () {
                     self.failToConnectToFoursquare = true;
+                }).always( function () {
+                    fillInfoWindow(marker);
                 });
             }
 
